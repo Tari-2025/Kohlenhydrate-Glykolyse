@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glykolyse‑Trainer – Schritte & Enzyme</title>
+  <style>
+    :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--ok:#16a34a;--bad:#dc2626;--card:#0b1220;--accent:#22d3ee}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;background:radial-gradient(1200px 600px at 80% -10%,#10233d,transparent),linear-gradient(180deg,#020617,#0b1220 50%,#020617);color:#e5e7eb;min-height:100vh;}
+    header{padding:28px 20px 10px;text-align:center}
+    h1{margin:0;font-size:clamp(20px,3vw,28px);letter-spacing:.3px}
+    p.sub{margin:.3rem 0 0;color:var(--muted)}
+    .app{max-width:900px;margin:0 auto;padding:18px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width:900px){.grid{grid-template-columns:1fr 360px}}
+    .card{background:rgba(255,255,255,.03);backdrop-filter: blur(4px);border:1px solid rgba(255,255,255,.06);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .card h2{margin:0 0 6px;font-size:18px;color:#e2e8f0}
+    .panel{padding:18px 18px 20px}
+    .q-stem{font-size:15px;color:var(--muted);margin-bottom:10px}
+    .molecule{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0a1222;border:1px solid rgba(255,255,255,.08);padding:12px 14px;border-radius:12px;margin:10px 0;display:flex;align-items:center;justify-content:space-between}
+    .molecule .tag{font-size:12px;color:#cbd5e1;background:#0b1930;border:1px solid rgba(255,255,255,.06);padding:4px 8px;border-radius:99px}
+    .options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .btn{border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#0e1a2d,#0a1322);padding:12px 14px;border-radius:12px;color:#e5e7eb;text-align:left;cursor:pointer;font-weight:600;transition:transform .04s ease, border-color .15s ease}
+    .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
+    .btn.correct{border-color:rgba(34,211,238,.6);outline:2px solid rgba(34,211,238,.25)}
+    .btn.wrong{border-color:rgba(220,38,38,.7);outline:2px solid rgba(220,38,38,.2)}
+    .footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+    .progress{height:10px;background:#0b1322;border:1px solid rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#38bdf8)}
+    .pill{font-size:12px;color:#94a3b8;padding:6px 10px;border-radius:999px;background:#0b1a30;border:1px solid rgba(255,255,255,.06)}
+    .actions{display:flex;gap:8px}
+    .ghost{background:transparent;border:1px dashed rgba(255,255,255,.2)}
+    .big{font-size:14px}
+    .hint{font-size:13px;color:#9ca3af;margin-top:10px}
+    .stat{display:flex;gap:8px;flex-wrap:wrap}
+    .kbd{font-family:ui-monospace,monospace;font-size:12px;background:#0b1a2e;border:1px solid rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;color:#cbd5e1}
+    a.inline{color:#8bdef4;text-decoration:none;border-bottom:1px dashed rgba(139,222,244,.4)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Glykolyse‑Trainer</h1>
+    <p class="sub">Quiz: Welches <strong>Enzym</strong> katalysiert den <strong>nächsten Schritt</strong>?</p>
+  </header>
+  <main class="app">
+    <div class="grid">
+      <!-- Quiz Card -->
+      <section class="card panel" id="quizCard">
+        <h2 id="qTitle">Frage</h2>
+        <div class="q-stem" id="qStem">Von Substrat ➜ Produkt. Wähle das richtige Enzym.</div>
+        <div class="molecule"><span id="substrate">Glukose</span><span class="tag">→</span><span id="product">Glukose‑6‑phosphat</span></div>
+        <div class="options" id="options"></div>
+        <div class="hint" id="hint"></div>
+        <div class="footer">
+          <div class="stat">
+            <span class="pill" id="progressPill">1 / 10</span>
+            <span class="pill" id="scorePill">Punkte: 0</span>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" id="skipBtn" title="Überspringen (Leertaste)">Überspringen</button>
+            <button class="btn big" id="nextBtn">Weiter</button>
+          </div>
+        </div>
+        <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+        <div class="hint">Tipp: Nutze <span class="kbd">Leertaste</span> für Überspringen und <span class="kbd">Enter</span> für Weiter.</div>
+      </section>
+
+      <!-- Info / Didaktik Card -->
+      <aside class="card panel">
+        <h2>Didaktik & Inhalt</h2>
+        <p class="sub">Geeignet für Selbstlern‑Phasen und kurze Aktivierungen in Seminaren.</p>
+        <ul>
+          <li>Fokus: Reihenfolge der Glykolyse‑Schritte (Substrat → Produkt → Enzym).</li>
+          <li>Zeitbedarf: 3–6 Minuten.</li>
+          <li>Varianten: 
+            <ul>
+              <li>"Produkt raten" statt Enzym,</li>
+              <li>"Inhibitor/Regulation" als Bonusfragen,</li>
+              <li>Drag‑and‑Drop‑Reihenfolge der gesamten Kette.</li>
+            </ul>
+          </li>
+        </ul>
+        <p>Einbettung in ILIAS: Lade diese <strong>eine</strong> HTML‑Datei hoch (Objekt „Datei“) oder verlinke sie. Funktioniert offline im Browser.</p>
+        <p>Design‑Hinweis: Farbiges Molekül‑Tag und dezente Neon‑Akzente für "Labor‑Look".</p>
+        <p><small>Autor: Tanja & Assistent • Lizenz: CC‑BY 4.0</small></p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // --- Datenbank der Schritte ---
+    const ITEMS = [
+      {s:"Glukose", p:"Glukose‑6‑phosphat", e:"Hexokinase / Glukokinase", hint:"ATP → ADP; irreversibel; Trap der Glukose"},
+      {s:"Glukose‑6‑phosphat", p:"Fruktose‑6‑phosphat", e:"Phosphoglukose‑Isomerase", hint:"Aldose ↔ Ketose"},
+      {s:"Fruktose‑6‑phosphat", p:"Fruktose‑1,6‑bisphosphat", e:"PFK‑1 (Phosphofruktokinase‑1)", hint:"ATP‑Verbrauch; wichtigster regulativer Schritt"},
+      {s:"Fruktose‑1,6‑bisphosphat", p:"Glycerinaldehyd‑3‑phosphat + Dihydroxyacetonphosphat", e:"Aldolase", hint:"C6 → 2×C3"},
+      {s:"Dihydroxyacetonphosphat", p:"Glycerinaldehyd‑3‑phosphat", e:"Triosphosphat‑Isomerase", hint:"DHAP ↔ GAP"},
+      {s:"Glycerinaldehyd‑3‑phosphat", p:"1,3‑Bisphosphoglycerat", e:"Glycerinaldehyd‑3‑phosphat‑Dehydrogenase", hint:"NAD+ → NADH; Pi eingebaut"},
+      {s:"1,3‑Bisphosphoglycerat", p:"3‑Phosphoglycerat", e:"Phosphoglycerat‑Kinase", hint:"ATP‑Gewinn (Substratkettenphosphorylierung)"},
+      {s:"3‑Phosphoglycerat", p:"2‑Phosphoglycerat", e:"Phosphoglycerat‑Mutase", hint:""},
+      {s:"2‑Phosphoglycerat", p:"Phosphoenolpyruvat (PEP)", e:"Enolase", hint:"H2O‑Abspaltung"},
+      {s:"Phosphoenolpyruvat (PEP)", p:"Pyruvat", e:"Pyruvat‑Kinase", hint:"ATP‑Gewinn; irreversibel"}
+    ];
+
+    // --- Optionengenerator mit Distraktoren ---
+    const ENZYMES = [...new Set(ITEMS.map(x=>x.e))];
+    function makeOptions(correct){
+      const opts = new Set([correct]);
+      while(opts.size<4){
+        const r = ENZYMES[Math.floor(Math.random()*ENZYMES.length)];
+        opts.add(r);
+      }
+      return Array.from(opts).sort(()=>Math.random()-0.5);
+    }
+
+    // --- State ---
+    let index = 0; let score = 0; let answered = false;
+
+    // --- UI Elemente ---
+    const qTitle = document.getElementById('qTitle');
+    const qStem = document.getElementById('qStem');
+    const substrate = document.getElementById('substrate');
+    const product = document.getElementById('product');
+    const hint = document.getElementById('hint');
+    const options = document.getElementById('options');
+    const nextBtn = document.getElementById('nextBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const progressPill = document.getElementById('progressPill');
+    const scorePill = document.getElementById('scorePill');
+    const bar = document.getElementById('bar');
+
+    function render(){
+      const item = ITEMS[index];
+      qTitle.textContent = `Frage ${index+1}`;
+      substrate.textContent = item.s;
+      product.textContent = item.p;
+      hint.textContent = '';
+      options.innerHTML='';
+      answered = false;
+      const opts = makeOptions(item.e);
+      opts.forEach(txt=>{
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.textContent = txt;
+        b.onclick = () => pick(b, txt===item.e);
+        options.appendChild(b);
+      });
+      progressPill.textContent = `${index+1} / ${ITEMS.length}`;
+      scorePill.textContent = `Punkte: ${score}`;
+      bar.style.width = `${(index)/ITEMS.length*100}%`;
+      nextBtn.textContent = index===ITEMS.length-1 ? 'Ergebnis anzeigen' : 'Weiter';
+    }
+
+    function pick(button, isCorrect){
+      if(answered) return; answered = true;
+      const item = ITEMS[index];
+      [...options.children].forEach(btn=>btn.disabled=true);
+      if(isCorrect){
+        button.classList.add('correct');
+        score++; hint.textContent = `Richtig ✓  ${item.hint? '• '+item.hint:''}`;
+      } else {
+        button.classList.add('wrong');
+        // Markiere die richtige Option
+        const right = [...options.children].find(b=>b.textContent===item.e);
+        right.classList.add('correct');
+        hint.textContent = `Nicht ganz. Richtig ist: ${item.e}. ${item.hint? '• '+item.hint:''}`;
+      }
+      scorePill.textContent = `Punkte: ${score}`;
+    }
+
+    nextBtn.addEventListener('click', ()=>{
+      if(index < ITEMS.length-1){ index++; render(); }
+      else showResult();
+    });
+
+    skipBtn.addEventListener('click', ()=>{
+      if(index < ITEMS.length-1){ index++; render(); }
+      else showResult();
+    });
+
+    function showResult(){
+      const pct = Math.round(score/ITEMS.length*100);
+      const html = `
+        <h2>Ergebnis</h2>
+        <p class="sub">Du hast <strong>${score}</strong> von <strong>${ITEMS.length}</strong> richtig beantwortet (${pct}%).</p>
+        <div class="hint">Vorschläge: Wiederhole Schlüsselenzyme <em>Hexokinase</em>, <em>PFK‑1</em> und <em>Pyruvat‑Kinase</em>, oder wechsle den Modus: Produkt raten / Reihenfolge sortieren.</div>
+        <div class="footer" style="margin-top:14px">
+          <button class="btn" onclick="restart()">Nochmal üben</button>
+          <button class="btn ghost" onclick="toggleMode()" title="Wechsle zum Produkt‑Quiz">Modus wechseln</button>
+        </div>`;
+      document.getElementById('quizCard').querySelector('.panel').innerHTML = html;
+      bar.style.width = '100%';
+    }
+
+    function restart(){ index = 0; score = 0; render(); }
+
+    // Bonus: Produkt‑Modus (statt Enzym raten)
+    let modeProduct = false;
+    function toggleMode(){ modeProduct = !modeProduct; setupMode(); }
+
+    function setupMode(){
+      // Wechsele Fragestellung + Optionen je nach Modus
+      if(!modeProduct){
+        qStem.textContent = 'Von Substrat ➜ Produkt. Wähle das richtige Enzym.';
+      } else {
+        qStem.textContent = 'Welches Produkt entsteht aus dem Substrat (gegeben ist das Enzym)?';
+      }
+      restart();
+    }
+
+    // Tastaturkürzel
+    window.addEventListener('keydown', (e)=>{
+      if(e.key===' '){ e.preventDefault(); skipBtn.click(); }
+      if(e.key==='Enter'){ e.preventDefault(); nextBtn.click(); }
+    });
+
+    // Überschreibe render() minimal für Produkt‑Modus
+    const baseRender = render;
+    render = function(){
+      const item = ITEMS[index];
+      qTitle.textContent = `Frage ${index+1}`;
+      hint.textContent = '';
+      options.innerHTML=''; answered = false;
+      if(!modeProduct){
+        substrate.textContent = item.s;
+        product.textContent = item.p;
+        const opts = makeOptions(item.e);
+        opts.forEach(txt=>{
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = txt;
+          b.onclick = () => pick(b, txt===item.e);
+          options.appendChild(b);
+        });
+      } else {
+        // Produkt‑Modus: Enzym vorgegeben, Produkt raten
+        substrate.textContent = item.s + ' — ' + item.e;
+        product.textContent = '???';
+        const allProducts = [...new Set(ITEMS.map(x=>x.p))];
+        const opts = new Set([item.p]);
+        while(opts.size<4){ opts.add(allProducts[Math.floor(Math.random()*allProducts.length)]); }
+        Array.from(opts).sort(()=>Math.random()-0.5).forEach(txt=>{
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = txt;
+          b.onclick = () => pickProduct(b, txt===item.p);
+          options.appendChild(b);
+        });
+      }
+      progressPill.textContent = `${index+1} / ${ITEMS.length}`;
+      scorePill.textContent = `Punkte: ${score}`;
+      bar.style.width = `${(index)/ITEMS.length*100}%`;
+      nextBtn.textContent = index===ITEMS.length-1 ? 'Ergebnis anzeigen' : 'Weiter';
+    }
+
+    function pickProduct(button, isCorrect){
+      if(answered) return; answered = true;
+      const item = ITEMS[index];
+      [...options.children].forEach(btn=>btn.disabled=true);
+      if(isCorrect){
+        button.classList.add('correct');
+        score++; hint.textContent = `Richtig ✓  ${item.hint? '• '+item.hint:''}`;
+      } else {
+        button.classList.add('wrong');
+        const right = [...options.children].find(b=>b.textContent===item.p);
+        right.classList.add('correct');
+        hint.textContent = `Nicht ganz. Richtiges Produkt: ${item.p}. ${item.hint? '• '+item.hint:''}`;
+      }
+      scorePill.textContent = `Punkte: ${score}`;
+    }
+
+    // Start
+    setupMode();
+  </script>
+</body>
+</html>
