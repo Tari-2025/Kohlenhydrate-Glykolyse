@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Glykolyse‑Trainer – Quiz, Regulation & Sortieren (offline)</title>
+  <title>Glykolyse-Trainer – Quiz, Regulation & Sortieren (offline)</title>
   <style>
     :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--ok:#16a34a;--bad:#dc2626;--card:#0b1220;--accent:#22d3ee}
     *{box-sizing:border-box}
@@ -54,7 +54,7 @@
 </head>
 <body>
   <header>
-    <h1>Glykolyse‑Trainer</h1>
+    <h1>Glykolyse-Trainer</h1>
     <p class="sub">Wähle oben den Modus: <strong>Quiz</strong> (Enzym/Produkt/Regulation) oder <strong>Sortieren</strong> (Drag & Drop).</p>
     <div class="tabs">
       <button id="tabQuiz" class="tab active">Quiz</button>
@@ -67,7 +67,7 @@
       <section class="card panel" id="quizCard">
         <h2 id="qTitle">Frage</h2>
         <div class="q-stem" id="qStem">Von Substrat ➜ Produkt. Wähle das richtige Enzym.</div>
-        <div class="molecule"><span id="substrate">Glukose</span><span class="tag">→</span><span id="product">Glukose‑6‑phosphat</span></div>
+        <div class="molecule"><span id="substrate">Glukose</span><span class="tag">→</span><span id="product">Glukose-6-phosphat</span></div>
         <div class="options" id="options"></div>
         <div class="hint" id="hint"></div>
         <div class="footer">
@@ -78,14 +78,14 @@
           <div class="actions">
             <button class="btn ghost" id="skipBtn" title="Überspringen (Leertaste)">Überspringen</button>
             <button class="btn big" id="nextBtn">Weiter</button>
-            <button class="btn ghost" id="toggleModeBtn" title="Quiz‑Modus umschalten">Modus: Enzym</button>
+            <button class="btn ghost" id="toggleModeBtn" title="Quiz-Modus umschalten">Modus: Enzym</button>
           </div>
         </div>
         <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
         <div class="hint">Tipp: Nutze <span class="kbd">Leertaste</span> für Überspringen und <span class="kbd">Enter</span> für Weiter.</div>
       </section>
 
-      <!-- Sortier‑Card -->
+      <!-- Sortier-Card -->
       <section class="card panel" id="orderCard" style="display:none">
         <h2>Reihenfolge der Glykolyse (Drag & Drop)</h2>
         <p class="q-stem">Bringe die Schritte in die korrekte Reihenfolge (1 → 10). Du kannst per Maus/Touch ziehen.</p>
@@ -102,19 +102,19 @@
             <button class="btn ghost" id="showSolutionBtn">Lösung</button>
           </div>
         </div>
-        <div class="hint" id="orderHint">Hinweis: Schritt 3 (PFK‑1) ist der wichtigste regulative Schritt.</div>
+        <div class="hint" id="orderHint">Hinweis: Schritt 3 (PFK-1) ist der wichtigste regulative Schritt.</div>
       </section>
 
       <!-- Info / Didaktik Card -->
       <aside class="card panel">
         <h2>Didaktik & Inhalt</h2>
-        <p class="sub">Geeignet für Selbstlern‑Phasen, auch während des Seminars.</p>
+        <p class="sub">Geeignet für Selbstlern-Phasen, auch während des Seminars.</p>
         <ul>
-          <li>Fokus: Reihenfolge und Regulation der Glykolyse‑Schritte (Substrat → Produkt → Enzym → Regulation).</li>
-          <li>Varianten:  <strong>Drag‑&‑Drop‑Reihenfolge Glykolyse</strong>,</li>
+          <li>Fokus: Reihenfolge und Regulation der Glykolyse-Schritte (Substrat → Produkt → Enzym → Regulation).</li>
+          <li>Varianten:  <strong>Drag-&-Drop-Reihenfolge Glykolyse</strong>,</li>
           <li>Zeitbedarf: 3–8 Minuten je nach Modus.</li>
         </ul>
-        <p><small>Autor: Tanja & Assistent • Lizenz: CC‑BY 4.0</small></p>
+        <p><small>Autor: Tanja & Assistent • Lizenz: CC-BY 4.0</small></p>
       </aside>
     </div>
   </main>
@@ -122,31 +122,31 @@
   <script>
     // === Datenbanken ===
     const ITEMS = [
-      {s:"Glukose", p:"Glukose‑6‑phosphat", e:"Hexokinase / Glukokinase", hint:"ATP → ADP; irreversibel; Trap der Glukose"},
-      {s:"Glukose‑6‑phosphat", p:"Fruktose‑6‑phosphat", e:"Phosphoglukose‑Isomerase", hint:"Aldose ↔ Ketose"},
-      {s:"Fruktose‑6‑phosphat", p:"Fruktose‑1,6‑bisphosphat", e:"PFK‑1 (Phosphofruktokinase‑1)", hint:"ATP‑Verbrauch; wichtigster regulativer Schritt"},
-      {s:"Fruktose‑1,6‑bisphosphat", p:"Glycerinaldehyd‑3‑phosphat + Dihydroxyacetonphosphat", e:"Aldolase", hint:"C6 → 2×C3"},
-      {s:"Dihydroxyacetonphosphat", p:"Glycerinaldehyd‑3‑phosphat", e:"Triosphosphat‑Isomerase", hint:"DHAP ↔ GAP"},
-      {s:"Glycerinaldehyd‑3‑phosphat", p:"1,3‑Bisphosphoglycerat", e:"Glycerinaldehyd‑3‑phosphat‑Dehydrogenase", hint:"NAD+ → NADH; Pi eingebaut"},
-      {s:"1,3‑Bisphosphoglycerat", p:"3‑Phosphoglycerat", e:"Phosphoglycerat‑Kinase", hint:"ATP‑Gewinn (Substratkettenphosphorylierung)"},
-      {s:"3‑Phosphoglycerat", p:"2‑Phosphoglycerat", e:"Phosphoglycerat‑Mutase", hint:""},
-      {s:"2‑Phosphoglycerat", p:"Phosphoenolpyruvat (PEP)", e:"Enolase", hint:"H2O‑Abspaltung"},
-      {s:"Phosphoenolpyruvat (PEP)", p:"Pyruvat", e:"Pyruvat‑Kinase", hint:"ATP‑Gewinn; irreversibel"}
+      {s:"Glukose", p:"Glukose-6-phosphat", e:"Hexokinase / Glukokinase", hint:"ATP → ADP; irreversibel; Trap der Glukose"},
+      {s:"Glukose-6-phosphat", p:"Fruktose-6-phosphat", e:"Phosphoglukose-Isomerase", hint:"Aldose ↔ Ketose"},
+      {s:"Fruktose-6-phosphat", p:"Fruktose-1,6-bisphosphat", e:"PFK-1 (Phosphofruktokinase-1)", hint:"ATP-Verbrauch; wichtigster regulativer Schritt"},
+      {s:"Fruktose-1,6-bisphosphat", p:"Glycerinaldehyd-3-phosphat + Dihydroxyacetonphosphat", e:"Aldolase", hint:"C6 → 2×C3"},
+      {s:"Dihydroxyacetonphosphat", p:"Glycerinaldehyd-3-phosphat", e:"Triosphosphat-Isomerase", hint:"DHAP ↔ GAP"},
+      {s:"Glycerinaldehyd-3-phosphat", p:"1,3-Bisphosphoglycerat", e:"Glycerinaldehyd-3-phosphat-Dehydrogenase", hint:"NAD+ → NADH; Pi eingebaut"},
+      {s:"1,3-Bisphosphoglycerat", p:"3-Phosphoglycerat", e:"Phosphoglycerat-Kinase", hint:"ATP-Gewinn (Substratkettenphosphorylierung)"},
+      {s:"3-Phosphoglycerat", p:"2-Phosphoglycerat", e:"Phosphoglycerat-Mutase", hint:""},
+      {s:"2-Phosphoglycerat", p:"Phosphoenolpyruvat (PEP)", e:"Enolase", hint:"H2O-Abspaltung"},
+      {s:"Phosphoenolpyruvat (PEP)", p:"Pyruvat", e:"Pyruvat-Kinase", hint:"ATP-Gewinn; irreversibel"}
     ];
 
     const REG_ITEMS = [
-      {q:"Stärkster Aktivator von PFK‑1 (Leber)?", opts:["ATP","Citrat","AMP","Fruktose‑2,6‑bisphosphat"], a:3, hint:"F‑2,6‑BP verschiebt PFK‑1 stark in Richtung R‑Zustand."},
-      {q:"Welcher hemmt PFK‑1?", opts:["ATP","AMP","ADP","F‑2,6‑BP"], a:0, hint:"Hohes ATP = hohe Energieladung → Drosselung."},
-      {q:"Welcher hemmt PFK‑1 zusätzlich zum ATP?", opts:["Citrat","Fruktose","Glycerol","Laktat"], a:0, hint:"Citrat koppelt Zitratzyklus an Glykolyse (Feedback)."},
-      {q:"Hexokinase wird gehemmt durch …", opts:["Fruktose‑6‑P","Glukose‑6‑P","Fruktose‑2,6‑BP","AMP"], a:1, hint:"Produkthemmung schützt vor Überphosphorylierung."},
-      {q:"Glukokinase (Leber) – indirekte Hemmung via GKRP durch …", opts:["Fruktose‑6‑P","Fruktose‑1‑P","G6P","PEP"], a:0, hint:"F‑6‑P fördert GKRP‑Bindung (Nukleäre Sequestration)."},
-      {q:"Pyruvat‑Kinase wird gehemmt durch …", opts:["F‑1,6‑BP","ATP","AMP","NAD+"], a:1, hint:"ATP/Alanin hemmen; F‑1,6‑BP aktiviert (Feed‑forward)."},
-      {q:"Pyruvat‑Kinase wird aktiviert durch …", opts:["Alanine","F‑1,6‑BP","Citrat","Acetyl‑CoA"], a:1, hint:"Feed‑forward von PFK‑1‑Produkt."},
-      {q:"Glukagon (PKA) in der Leber bewirkt auf F‑2,6‑BP …", opts:["Erhöhung","Senkung","keinen Effekt","erst Erhöhung, dann Senkung"], a:1, hint:"PKA phosphoryliert PFK‑2/FBPase‑2 → F‑2,6‑BP sinkt."},
-      {q:"Insulin signalisiert …", opts:["F‑2,6‑BP↓","F‑2,6‑BP↑","kein Effekt","Glykolyse↓"], a:1, hint:"Dephosphorylierung → PFK‑2 aktiv → F‑2,6‑BP steigt."},
-      {q:"Energiesignal, das Glykolyse generell drosselt?", opts:["AMP↑","ATP↑","ADP↑","F‑2,6‑BP↑"], a:1, hint:"Hohe Energieladung (ATP) hemmt Schlüsselenzyme."},
-      {q:"Welches Enzym ist der wichtigste Kontrollpunkt der Glykolyse?", opts:["Hexokinase","PFK‑1","Aldolase","Enolase"], a:1, hint:"PFK‑1 ist rate‑limiting in vielen Geweben."},
-      {q:"Allosterischer Aktivator von PFK‑1 bei Energiemangel?", opts:["AMP","ATP","Citrat","Acetyl‑CoA"], a:0, hint:"AMP signalisiert niedrige Energieladung."}
+      {q:"Stärkster Aktivator von PFK-1 (Leber)?", opts:["ATP","Citrat","AMP","Fruktose-2,6-bisphosphat"], a:3, hint:"F-2,6-BP verschiebt PFK-1 stark in Richtung R-Zustand."},
+      {q:"Welcher hemmt PFK-1?", opts:["ATP","AMP","ADP","F-2,6-BP"], a:0, hint:"Hohes ATP = hohe Energieladung → Drosselung."},
+      {q:"Welcher hemmt PFK-1 zusätzlich zum ATP?", opts:["Citrat","Fruktose","Glycerol","Laktat"], a:0, hint:"Citrat koppelt Zitratzyklus an Glykolyse (Feedback)."},
+      {q:"Hexokinase wird gehemmt durch …", opts:["Fruktose-6-P","Glukose-6-P","Fruktose-2,6-BP","AMP"], a:1, hint:"Produkthemmung schützt vor Überphosphorylierung."},
+      {q:"Glukokinase (Leber) – indirekte Hemmung via GKRP durch …", opts:["Fruktose-6-P","Fruktose-1-P","G6P","PEP"], a:0, hint:"F-6-P fördert GKRP-Bindung (Nukleäre Sequestration)."},
+      {q:"Pyruvat-Kinase wird gehemmt durch …", opts:["F-1,6-BP","ATP","AMP","NAD+"], a:1, hint:"ATP/Alanin hemmen; F-1,6-BP aktiviert (Feed-forward)."},
+      {q:"Pyruvat-Kinase wird aktiviert durch …", opts:["Alanine","F-1,6-BP","Citrat","Acetyl-CoA"], a:1, hint:"Feed-forward von PFK-1-Produkt."},
+      {q:"Glukagon (PKA) in der Leber bewirkt auf F-2,6-BP …", opts:["Erhöhung","Senkung","keinen Effekt","erst Erhöhung, dann Senkung"], a:1, hint:"PKA phosphoryliert PFK-2/FBPase-2 → F-2,6-BP sinkt."},
+      {q:"Insulin signalisiert …", opts:["F-2,6-BP↓","F-2,6-BP↑","kein Effekt","Glykolyse↓"], a:1, hint:"Dephosphorylierung → PFK-2 aktiv → F-2,6-BP steigt."},
+      {q:"Energiesignal, das Glykolyse generell drosselt?", opts:["AMP↑","ATP↑","ADP↑","F-2,6-BP↑"], a:1, hint:"Hohe Energieladung (ATP) hemmt Schlüsselenzyme."},
+      {q:"Welches Enzym ist der wichtigste Kontrollpunkt der Glykolyse?", opts:["Hexokinase","PFK-1","Aldolase","Enolase"], a:1, hint:"PFK-1 ist rate-limiting in vielen Geweben."},
+      {q:"Allosterischer Aktivator von PFK-1 bei Energiemangel?", opts:["AMP","ATP","Citrat","Acetyl-CoA"], a:0, hint:"AMP signalisiert niedrige Energieladung."}
     ];
 
     // === Quiz State ===
@@ -220,15 +220,25 @@
     function pick(button, isCorrect, info=''){
       if(answered) return; answered=true;
       [...options.children].forEach(btn=>btn.disabled=true);
-      if(isCorrect){ button.classList.add('correct'); score++; hint.textContent=`Richtig ✓ ${info? '• '+info:''}`; }
-      else{ button.classList.add('wrong');
-        // Markiere richtige Option
+      if(isCorrect){
+        button.classList.add('correct'); score++;
+        hint.textContent=`Richtig ✓ ${info? '• '+info:''}`;
+      } else {
+        button.classList.add('wrong');
+        // ✅ Robuste Markierung der richtigen Antwort in allen Modi:
         if(quizMode==='enzyme'){
-          const item=ITEMS[index]; const right=[...options.children].find(b=>b.textContent===item.e); right?.classList.add('correct');
+          const item=ITEMS[index];
+          const right=[...options.children].find(b=>b.textContent===item.e);
+          right?.classList.add('correct');
         } else if(quizMode==='product'){
-          const item=ITEMS[index]; const right=[...options.children].find(b=>b.textContent===item.p); right?.classList.add('correct');
+          const item=ITEMS[index];
+          const right=[...options.children].find(b=>b.textContent===item.p);
+          right?.classList.add('correct');
         } else {
-          const q=REG_ITEMS[index]; const right=[...options.children][q.a]; right?.classList.add('correct');
+          const q=REG_ITEMS[index];
+          const correctText = q.opts[q.a]; // Original-Text der richtigen Antwort
+          const rightBtn = [...options.children].find(b => b.textContent === correctText);
+          rightBtn?.classList.add('correct');
         }
         hint.textContent=`Nicht ganz. ${info? info:''}`;
       }
@@ -244,11 +254,11 @@
 
     function showResult(){
       const total=currentLength(); const pct = Math.round(score/total*100);
-      const modeLabel = quizMode==='enzyme' ? 'Enzym‑Quiz' : quizMode==='product' ? 'Produkt‑Quiz' : 'Regulations‑Quiz';
+      const modeLabel = quizMode==='enzyme' ? 'Enzym-Quiz' : quizMode==='product' ? 'Produkt-Quiz' : 'Regulations-Quiz';
       const html = `
         <h2>Ergebnis</h2>
         <p class="sub">${modeLabel}: <strong>${score}</strong> von <strong>${total}</strong> richtig (${pct}%).</p>
-        <div class="hint">Tipps: Wiederhole Schlüsselenzyme <em>Hexokinase</em>, <em>PFK‑1</em>, <em>Pyruvat‑Kinase</em> – und merke dir F‑2,6‑BP (starker PFK‑1‑Aktivator).</div>
+        <div class="hint">Tipps: Schlüsselenzyme <em>Hexokinase</em>, <em>PFK-1</em>, <em>Pyruvat-Kinase</em> – und merke dir F-2,6-BP (starker PFK-1-Aktivator).</div>
         <div class="footer" style="margin-top:14px">
           <button class="btn" onclick="(index=0,score=0,renderQuiz())">Nochmal üben</button>
           <button class="btn ghost" onclick="switchToOrder()">Zum Sortieren</button>
