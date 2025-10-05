@@ -29,7 +29,7 @@
     .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
     .btn.correct{border-color:rgba(34,211,238,.6);outline:2px solid rgba(34,211,238,.25)}
     .btn.wrong{border-color:rgba(220,38,38,.7);outline:2px solid rgba(220,38,38,.2)}
-    .footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+    .footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
     .progress{height:10px;background:#0b1322;border:1px solid rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
     .bar{height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#38bdf8)}
     .pill{font-size:12px;color:#94a3b8;padding:6px 10px;border-radius:999px;background:#0b1a30;border:1px solid rgba(255,255,255,.06)}
@@ -154,7 +154,7 @@
     let quizMode = 'enzyme'; // 'enzyme' | 'product' | 'regulation'
     let index = 0; let score = 0; let answered = false;
 
-    // UI Elemente Quiz
+    // UI
     const qTitle = document.getElementById('qTitle');
     const qStem = document.getElementById('qStem');
     const substrate = document.getElementById('substrate');
@@ -187,7 +187,7 @@
         qStem.textContent = 'Von Substrat ➜ Produkt. Wähle das richtige Enzym.';
         substrate.textContent = item.s; product.textContent = item.p;
         makeOptions(item.e).forEach(txt=>{
-          const b=document.createElement('button'); b.className='btn'; b.textContent=txt; b.onclick=()=>pick(b, txt===item.e, item.hint); options.appendChild(b);
+          const b=document.createElement('button'); b.className='btn'; b.textContent=txt; b.onclick=()=>pick(b, txt===item.e, `Richtig ist: ${item.e}. ${item.hint? '• '+item.hint:''}`); options.appendChild(b);
         });
         toggleModeBtn.textContent='Modus: Enzym';
       } else if(quizMode==='product'){
@@ -197,7 +197,7 @@
         const allProducts = [...new Set(ITEMS.map(x=>x.p))];
         const opts = new Set([item.p]); while(opts.size<4){ opts.add(allProducts[Math.floor(Math.random()*allProducts.length)]); }
         Array.from(opts).sort(()=>Math.random()-0.5).forEach(txt=>{
-          const b=document.createElement('button'); b.className='btn'; b.textContent=txt; b.onclick=()=>pick(b, txt===item.p, item.hint); options.appendChild(b);
+          const b=document.createElement('button'); b.className='btn'; b.textContent=txt; b.onclick=()=>pick(b, txt===item.p, `Richtig ist: ${item.p}. ${item.hint? '• '+item.hint:''}`); options.appendChild(b);
         });
         toggleModeBtn.textContent='Modus: Produkt';
       } else {
@@ -206,7 +206,7 @@
         substrate.textContent = 'Regulation'; product.textContent = '—';
         const shuffled = q.opts.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5);
         shuffled.forEach(({t,i})=>{
-          const b=document.createElement('button'); b.className='btn'; b.textContent=t; b.onclick=()=>pick(b, i===q.a, q.hint); options.appendChild(b);
+          const b=document.createElement('button'); b.className='btn'; b.textContent=t; b.onclick=()=>pick(b, i===q.a, `Richtig ist: ${q.opts[q.a]}. ${q.hint? '• '+q.hint:''}`); options.appendChild(b);
         });
         toggleModeBtn.textContent='Modus: Regulation';
       }
@@ -217,30 +217,31 @@
       nextBtn.textContent = index===total-1 ? 'Ergebnis anzeigen' : 'Weiter';
     }
 
-    function pick(button, isCorrect, info=''){
+    function pick(button, isCorrect, feedback=''){
       if(answered) return; answered=true;
       [...options.children].forEach(btn=>btn.disabled=true);
+
       if(isCorrect){
         button.classList.add('correct'); score++;
-        hint.textContent=`Richtig ✓ ${info? '• '+info:''}`;
+        hint.textContent = `Richtig ✓ ${feedback? '• '+feedback : ''}`;
       } else {
         button.classList.add('wrong');
-        // ✅ Robuste Markierung der richtigen Antwort in allen Modi:
+
+        // → Den tatsächlich richtigen Button per Textvergleich finden (robust trotz Shuffle)
+        let correctText = '';
         if(quizMode==='enzyme'){
-          const item=ITEMS[index];
-          const right=[...options.children].find(b=>b.textContent===item.e);
-          right?.classList.add('correct');
+          correctText = ITEMS[index].e;
         } else if(quizMode==='product'){
-          const item=ITEMS[index];
-          const right=[...options.children].find(b=>b.textContent===item.p);
-          right?.classList.add('correct');
+          correctText = ITEMS[index].p;
         } else {
-          const q=REG_ITEMS[index];
-          const correctText = q.opts[q.a]; // Original-Text der richtigen Antwort
-          const rightBtn = [...options.children].find(b => b.textContent === correctText);
-          rightBtn?.classList.add('correct');
+          const q = REG_ITEMS[index];
+          correctText = q.opts[q.a];
         }
-        hint.textContent=`Nicht ganz. ${info? info:''}`;
+        const rightBtn = [...options.children].find(b => b.textContent === correctText);
+        rightBtn?.classList.add('correct');
+
+        // Klare Rückmeldung mit richtiger Lösung
+        hint.textContent = `Nicht ganz. ${feedback || ('Richtig ist: '+correctText)}`;
       }
       scorePill.textContent = `Punkte: ${score}`;
     }
