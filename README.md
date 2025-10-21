@@ -1,3 +1,0 @@
-# Kohlenhydrate-Glykolyse
-Glykolyse-Quiz
-
