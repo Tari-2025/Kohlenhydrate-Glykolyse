@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kohlenhydrate – Lern-Tools (Start)</title>
+  <meta name="description" content="Startseite für Glykolyse-, Glukoneogenese- und Glykogen-Trainer (offline & GitHub Pages-ready)." />
+  <style>
+    :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--ok:#16a34a;--accent:#22d3ee;--card:#0b1220}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;
+      background:radial-gradient(1200px 600px at 80% -10%,#10233d,transparent),
+                 linear-gradient(180deg,#020617,#0b1220 50%,#020617);
+      color:#e5e7eb;min-height:100vh}
+    header{padding:36px 20px 10px;text-align:center}
+    h1{margin:0;font-size:clamp(22px,3.5vw,34px);letter-spacing:.3px}
+    p.sub{margin:.5rem 0 0;color:var(--muted)}
+    main{max-width:1080px;margin:0 auto;padding:20px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .card{background:rgba(255,255,255,.03);backdrop-filter: blur(4px);
+      border:1px solid rgba(255,255,255,.06);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.3);padding:18px;display:flex;flex-direction:column;gap:12px}
+    .card h2{margin:0;font-size:18px;color:#e2e8f0;display:flex;align-items:center;gap:10px}
+    .card p{margin:0;color:#c7d2fe;min-height:48px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;
+      background:linear-gradient(180deg,#0e1a2d,#0a1322);color:#e5e7eb;text-decoration:none;font-weight:700}
+    .btn:hover{transform:translateY(-1px);border-color:rgba(34,211,238,.45)}
+    .footer{max-width:1080px;margin:24px auto 40px;color:var(--muted);text-align:center;padding:0 20px}
+    .tag{font-size:12px;color:#94a3b8;padding:4px 8px;border-radius:999px;background:#0b1a30;border:1px solid rgba(255,255,255,.06)}
+    .stack{display:flex;flex-wrap:wrap;gap:8px}
+    .iconsvg{width:22px;height:22px;opacity:.9}
+    a.small{color:#8bdef4;text-decoration:none;border-bottom:1px dashed rgba(139,222,244,.4)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kohlenhydrate – Lern-Tools</h1>
+    <p class="sub">Interaktive Trainer zu <strong>Glykolyse</strong>, <strong>Glukoneogenese</strong> und <strong>Glykogen‑Stoffwechsel</strong>. Offline & GitHub Pages‑ready.</p>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- Glykolyse -->
+      <article class="card">
+        <h2>
+          <svg class="iconsvg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 12h6l2-7 2 14 2-7h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Glykolyse‑Trainer
+        </h2>
+        <p>Quiz (Enzym/Produkt/Regulation) & Sortieren der 10 Schritte. Merke: Hexokinase, PFK‑1, Pyruvat‑Kinase.</p>
+        <div class="stack">
+          <span class="tag">Enzym/Produkt</span><span class="tag">Regulation</span><span class="tag">Drag & Drop</span>
+        </div>
+        <a class="btn" href="glykolyse_enzym_reg-produkt.html">
+          Starten
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </article>
+
+      <!-- Glukoneogenese -->
+      <article class="card">
+        <h2>
+          <svg class="iconsvg" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3v18M5 10l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Glukoneogenese‑Trainer
+        </h2>
+        <p>Bypass‑Schritte (Pyruvat‑Carboxylase, PEPCK, FBPase‑1, G6Pase), Quiz & Sortieren vom Pyruvat zur Glukose.</p>
+        <div class="stack">
+          <span class="tag">Enzym/Produkt</span><span class="tag">Regulation</span><span class="tag">Drag & Drop</span>
+        </div>
+        <a class="btn" href="glukoneogenese_trainer.html">
+          Starten
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </article>
+
+      <!-- Glykogen -->
+      <article class="card">
+        <h2>
+          <svg class="iconsvg" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Glykogen‑Trainer
+        </h2>
+        <p>Synthese & Abbau mit Pfad‑Umschaltung, Enzym‑ und Regulationsquiz. Debranching: Transferase + α‑1,6‑Glukosidase.</p>
+        <div class="stack">
+          <span class="tag">Synthese</span><span class="tag">Abbau</span><span class="tag">Regulation</span>
+        </div>
+        <a class="btn" href="glykogen_trainer.html">
+          Starten
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </article>
+    </div>
+  </main>
+
+  <div class="footer">
+    <p>Tipps: Lege alle Dateien in denselben Ordner. Auf <a class="small" href="https://pages.github.com/">GitHub Pages</a> genügt <code>index.html</code> im Repo‑Root. Lizenz: CC‑BY 4.0 • Autor: Tanja & ChatGPT‑5</p>
+  </div>
+</body>
+</html>
