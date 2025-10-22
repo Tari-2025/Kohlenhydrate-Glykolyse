@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glykogen‑Trainer – Synthese & Abbau (offline)</title>
+  <style>
+    :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--ok:#16a34a;--bad:#dc2626;--card:#0b1220;--accent:#22d3ee}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;
+      background:radial-gradient(1200px 600px at 80% -10%,#10233d,transparent),
+                 linear-gradient(180deg,#020617,#0b1220 50%,#020617);
+      color:#e5e7eb;min-height:100vh}
+    header{padding:28px 20px 10px;text-align:center}
+    h1{margin:0;font-size:clamp(20px,3vw,28px);letter-spacing:.3px}
+    p.sub{margin:.3rem 0 0;color:var(--muted)}
+    .tabs{margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+    .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.04);color:#cbd5e1;cursor:pointer}
+    .tab.active{background:linear-gradient(180deg,#11223b,#0a1526);border-color:rgba(34,211,238,.5);color:#e6faff}
+
+    .app{max-width:1000px;margin:0 auto;padding:18px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width:1024px){.grid{grid-template-columns:1fr 360px}}
+    .card{background:rgba(255,255,255,.03);backdrop-filter: blur(4px);border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .card h2{margin:0 0 6px;font-size:18px;color:#e2e8f0}
+    .panel{padding:18px 18px 20px}
+    .q-stem{font-size:15px;color:var(--muted);margin-bottom:10px}
+    .molecule{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background:#0a1222;
+      border:1px solid rgba(255,255,255,.08);padding:12px 14px;border-radius:12px;margin:10px 0;display:flex;align-items:center;justify-content:space-between}
+    .molecule .tag{font-size:12px;color:#cbd5e1;background:#0b1930;border:1px solid rgba(255,255,255,.06);padding:4px 8px;border-radius:99px}
+    .options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .btn{border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#0e1a2d,#0a1322);padding:12px 14px;border-radius:12px;color:#e5e7eb;text-align:left;cursor:pointer;font-weight:600;transition:transform .04s ease, border-color .15s ease}
+    .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
+    .btn.correct{border-color:rgba(34,211,238,.6);outline:2px solid rgba(34,211,238,.25)}
+    .btn.wrong{border-color:rgba(220,38,38,.7);outline:2px solid rgba(220,38,38,.2)}
+    .footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
+    .progress{height:10px;background:#0b1322;border:1px solid rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#38bdf8)}
+    .pill{font-size:12px;color:#94a3b8;padding:6px 10px;border-radius:999px;background:#0b1a30;border:1px solid rgba(255,255,255,.06)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .ghost{background:transparent;border:1px dashed rgba(255,255,255,.2)}
+    .big{font-size:14px}
+    .hint{font-size:13px;color:#9ca3af;margin-top:10px}
+    .stat{display:flex;gap:8px;flex-wrap:wrap}
+    .kbd{font-family:ui-monospace,monospace;font-size:12px;background:#0b1a2e;border:1px solid rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;color:#cbd5e1}
+
+    /* Sortiermodus */
+    .order-wrap{margin-top:10px}
+    .order-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .order-item{background:linear-gradient(180deg,#0e1a2d,#0a1322);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+    .drag{cursor:grab;opacity:.95}
+    .drag:active{cursor:grabbing}
+    .order-item.correct{border-color:rgba(34,211,238,.55)}
+    .order-item.wrong{border-color:rgba(220,38,38,.6)}
+    .order-ghost{border:2px dashed rgba(34,211,238,.5); background:rgba(34,211,238,.06)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Glykogen‑Trainer</h1>
+    <p class="sub">Modi: <strong>Quiz</strong> (Enzym/Regulation) & <strong>Sortieren</strong> (Synthese/Abbau). <small>Autor: T. Riyahi & ChatGPT‑5 • Lizenz: CC‑BY 4.0</small></p>
+    <div class="tabs">
+      <button id="tabQuiz" class="tab active">Quiz</button>
+      <button id="tabOrder" class="tab">Sortieren</button>
+    </div>
+  </header>
+
+  <main class="app">
+    <div class="grid">
+      <!-- Quiz Card -->
+      <section class="card panel" id="quizCard">
+        <h2 id="qTitle">Frage</h2>
+        <div class="q-stem" id="qStem">Substrat ➜ Produkt. Wähle das passende Enzym.</div>
+        <div class="molecule"><span id="substrate">Glukose‑6‑phosphat</span><span class="tag">→</span><span id="product">Glukose‑1‑phosphat</span></div>
+        <div class="options" id="options"></div>
+        <div class="hint" id="hint"></div>
+        <div class="footer">
+          <div class="stat">
+            <span class="pill" id="progressPill">1 / 9</span>
+            <span class="pill" id="scorePill">Punkte: 0</span>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" id="skipBtn" title="Überspringen (Leertaste)">Überspringen</button>
+            <button class="btn big" id="nextBtn">Weiter</button>
+            <button class="btn ghost" id="toggleModeBtn" title="Quizmodus umschalten">Modus: Enzym</button>
+          </div>
+        </div>
+        <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+        <div class="hint">Tipp: <span class="kbd">Leertaste</span> = Überspringen, <span class="kbd">Enter</span> = Weiter.</div>
+      </section>
+
+      <!-- Sortier-Card -->
+      <section class="card panel" id="orderCard" style="display:none">
+        <h2>Glykogenstoffwechsel – Sortieren</h2>
+        <p class="q-stem">Ordne die Schritte der <strong>Synthese</strong> oder des <strong>Abbaus</strong> korrekt. (Umschalten unten.)</p>
+        <div class="order-wrap">
+          <ol class="order-list" id="orderList"></ol>
+        </div>
+        <div class="footer">
+          <div class="stat"><span class="pill" id="orderScore">Korrekte Positionen: 0</span></div>
+          <div class="actions">
+            <button class="btn" id="checkOrderBtn">Prüfen</button>
+            <button class="btn ghost" id="shuffleOrderBtn">Neu mischen</button>
+            <button class="btn ghost" id="showSolutionBtn">Lösung</button>
+            <button class="btn" id="togglePathBtn" title="Zwischen Synthese und Abbau wechseln">Pfad: Synthese</button>
+          </div>
+        </div>
+        <div class="hint" id="orderHint">Hinweis: UDP‑Glukose = aktivierte Einheit; Debranching = Transferase + α‑1,6‑Glukosidase.</div>
+      </section>
+
+      <!-- Info / Didaktik Card -->
+      <aside class="card panel">
+        <h2>Didaktik & Inhalt</h2>
+        <ul>
+          <li>Abdeckung: Enzyme, allosterische Effekte (AMP, ATP, Ca²⁺, G6P) & Hormonwirkung (Insulin/Glukagon/Adrenalin).</li>
+          <li>Sortiermodus mit zwei Pfaden: <em>Synthese</em> vs. <em>Abbau</em>.</li>
+          <li>Zeitbedarf: 4–9 Minuten.</li>
+        </ul>
+        <p class="sub">Autor: T. Riyahi & ChatGPT‑5 • Lizenz: CC‑BY 4.0</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // === Daten ===
+    // Quiz-Items: Mischung aus Synthese und Abbau
+    const ITEMS = [
+      // Umwandlungen
+      {s:"Glukose‑6‑phosphat", p:"Glukose‑1‑phosphat", e:"Phosphoglucomutase", hint:"Reversibel; G6P ↔ G1P"},
+      {s:"Glukose‑1‑phosphat + UTP", p:"UDP‑Glukose + PPi", e:"UDP‑Glukose‑Pyrophosphorylase", hint:"Aktivierte Zuckereinheit für Synthese"},
+      {s:"UDP‑Glukose", p:"Glykogen (α1→4)", e:"Glykogen‑Synthase", hint:"Verlängert Kette am nicht‑reduzierenden Ende"},
+      {s:"Lineare Kette", p:"Verzweigtes Glykogen", e:"Branching‑Enzym", hint:"Amylo‑(1,4→1,6)‑Transglycosylase"},
+      {s:"Glykogen (α1→4‑Enden)", p:"Glukose‑1‑phosphat", e:"Glykogen‑Phosphorylase", hint:"PLP‑abhängig; entfernt Glukosereste als G1P"},
+      {s:"Grenzverzweigung", p:"verkürzte Kette + freie Glukose", e:"Debranching‑Enzym", hint:"Transferase + α‑1,6‑Glukosidase (zweischrittig)"},
+      {s:"Glukose‑1‑phosphat", p:"Glukose‑6‑phosphat", e:"Phosphoglucomutase", hint:"Muskel nutzt G6P in der Glykolyse"},
+      {s:"Glukose‑6‑phosphat (Leber)", p:"Glukose", e:"Glukose‑6‑Phosphatase", hint:"Nur Leber/Niere → Blutzuckerfreisetzung"},
+      {s:"Glykogenin (Primer)", p:"kurze Starterkette", e:"Glykogenin (Autoglycosylierung)", hint:"Start der Synthese"}
+    ];
+
+    const REG_ITEMS = [
+      {q:"PKA (Glukagon/Adrenalin) wirkt in der Leber primär …", opts:["Synthase aktiv","Phosphorylase aktiv","PP1 aktiv","F‑2,6‑BP steigt"], a:1, hint:"Phosphorylierung: Synthase↓, Phosphorylase↑"},
+      {q:"Insulin/PP1 in der Leber …", opts:["dephosphoryliert und aktiviert Synthase","aktiviert Phosphorylase","erhöht cAMP","hemmt Glukoseaufnahme"], a:0, hint:"PP1: Synthase a aktiv, Phosphorylase b inaktiv"},
+      {q:"Allosterische Regulation im Muskel: AMP …", opts:["hemmt Phosphorylase","aktiviert Phosphorylase","aktiviert Synthase","hemmt PFK‑1"], a:1, hint:"AMP → Energiemangel → schnellerer Abbau"},
+      {q:"Ca²⁺ (Kontraktion, Muskel) aktiviert …", opts:["Phosphorylase‑Kinase","Glykogen‑Synthase","Adenylat‑Cyclase","Glycogenin"], a:0, hint:"Ca²⁺‑Calmodulin aktiviert unabhängig von Hormonen"},
+      {q:"Leber: Glukose bindet allosterisch an …", opts:["Phosphorylase a (T‑State)","Synthase a","PFK‑1","Branching‑Enzym"], a:0, hint:"Hohe Glukose → Phosphorylase inaktiviert"},
+      {q:"G6P wirkt auf Glykogen‑Synthase …", opts:["aktivierend","hemmend","kein Effekt","nur im Muskel hemmend"], a:0, hint:"Aktiviert Synthase b allosterisch"}
+    ];
+
+    // === Quiz State ===
+    const ENZYMES = [...new Set(ITEMS.map(x=>x.e))];
+    let quizMode = 'enzyme'; // 'enzyme' | 'regulation'
+    let index = 0; let score = 0; let answered = false;
+
+    // UI
+    const qTitle = document.getElementById('qTitle');
+    const qStem = document.getElementById('qStem');
+    const substrate = document.getElementById('substrate');
+    const product = document.getElementById('product');
+    const hint = document.getElementById('hint');
+    const options = document.getElementById('options');
+    const nextBtn = document.getElementById('nextBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const toggleModeBtn = document.getElementById('toggleModeBtn');
+    const progressPill = document.getElementById('progressPill');
+    const scorePill = document.getElementById('scorePill');
+    const bar = document.getElementById('bar');
+
+    function makeOptions(correct){
+      const opts = new Set([correct]);
+      while(opts.size<4){ opts.add(ENZYMES[Math.floor(Math.random()*ENZYMES.length)]); }
+      return Array.from(opts).sort(()=>Math.random()-0.5);
+    }
+
+    function currentLength(){ return quizMode==='regulation' ? REG_ITEMS.length : ITEMS.length; }
+
+    function renderQuiz(){
+      const total = currentLength();
+      qTitle.textContent = `Frage ${index+1}`;
+      hint.textContent = '';
+      options.innerHTML=''; answered=false;
+
+      if(quizMode==='enzyme'){
+        const item = ITEMS[index];
+        qStem.textContent = 'Substrat ➜ Produkt. Wähle das passende Enzym.';
+        substrate.textContent = item.s; product.textContent = item.p;
+        makeOptions(item.e).forEach(txt=>{
+          const b=document.createElement('button'); b.className='btn'; b.textContent=txt; b.onclick=()=>pick(b, txt===item.e, `Richtig: ${item.e}. ${item.hint? '• '+item.hint:''}`); options.appendChild(b);
+        });
+        toggleModeBtn.textContent='Modus: Enzym';
+      } else {
+        const q = REG_ITEMS[index];
+        qStem.textContent = q.q;
+        substrate.textContent = 'Regulation'; product.textContent = '—';
+        const shuffled = q.opts.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5);
+        shuffled.forEach(({t,i})=>{
+          const b=document.createElement('button'); b.className='btn'; b.textContent=t; b.onclick=()=>pick(b, i===q.a, `Richtig: ${q.opts[q.a]}. ${q.hint? '• '+q.hint:''}`); options.appendChild(b);
+        });
+        toggleModeBtn.textContent='Modus: Regulation';
+      }
+
+      progressPill.textContent = `${index+1} / ${total}`;
+      scorePill.textContent = `Punkte: ${score}`;
+      bar.style.width = `${(index)/total*100}%`;
+      nextBtn.textContent = index===total-1 ? 'Ergebnis anzeigen' : 'Weiter';
+    }
+
+    function pick(button, isCorrect, feedback=''){
+      if(answered) return; answered=true;
+      [...options.children].forEach(btn=>btn.disabled=true);
+
+      if(isCorrect){
+        button.classList.add('correct'); score++;
+        hint.textContent = `Richtig ✓ ${feedback? '• '+feedback : ''}`;
+      } else {
+        button.classList.add('wrong');
+        let correctText = '';
+        if(quizMode==='enzyme'){ correctText = ITEMS[index].e; }
+        else { const q = REG_ITEMS[index]; correctText = q.opts[q.a]; }
+        const rightBtn = [...options.children].find(b => b.textContent === correctText);
+        rightBtn?.classList.add('correct');
+        hint.textContent = `Nicht ganz. ${feedback || ('Richtig ist: '+correctText)}`;
+      }
+      scorePill.textContent = `Punkte: ${score}`;
+    }
+
+    nextBtn.addEventListener('click', ()=>{ const total=currentLength(); if(index<total-1){ index++; renderQuiz(); } else showResult(); });
+    skipBtn.addEventListener('click', ()=>{ const total=currentLength(); if(index<total-1){ index++; renderQuiz(); } else showResult(); });
+    toggleModeBtn.addEventListener('click', ()=>{
+      quizMode = quizMode==='enzyme' ? 'regulation' : 'enzyme';
+      index=0; score=0; renderQuiz();
+    });
+
+    function showResult(){
+      const total=currentLength(); const pct = Math.round(score/total*100);
+      const modeLabel = quizMode==='enzyme' ? 'Enzym‑Quiz' : 'Regulations‑Quiz';
+      const html = `
+        <h2>Ergebnis</h2>
+        <p class="sub">${modeLabel}: <strong>${score}</strong> von <strong>${total}</strong> richtig (${pct}%).</p>
+        <div class="hint">Merke: Insulin/PP1 → Synthase aktiv; PKA/Ca²⁺ → Phosphorylase aktiv. Leber vs. Muskel unterscheiden!</div>
+        <div class="footer" style="margin-top:14px">
+          <button class="btn" onclick="(index=0,score=0,renderQuiz())">Nochmal üben</button>
+          <button class="btn ghost" onclick="switchToOrder()">Zum Sortieren</button>
+        </div>`;
+      document.getElementById('quizCard').querySelector('.panel').innerHTML = html;
+      bar.style.width = '100%';
+    }
+
+    // Tastaturkürzel
+    window.addEventListener('keydown', (e)=>{ if(e.key===' '){ e.preventDefault(); skipBtn.click(); } if(e.key==='Enter'){ e.preventDefault(); nextBtn.click(); } });
+
+    // === Sortiermodus (zwei Pfade) ===
+    const orderListEl = document.getElementById('orderList');
+    const orderScoreEl = document.getElementById('orderScore');
+    const checkOrderBtn = document.getElementById('checkOrderBtn');
+    const shuffleOrderBtn = document.getElementById('shuffleOrderBtn');
+    const showSolutionBtn = document.getElementById('showSolutionBtn');
+    const togglePathBtn = document.getElementById('togglePathBtn');
+
+    const SYNTHESIS_STEPS = [
+      'Glykogenin (Primer) → Starterkette',
+      'Glukose‑1‑phosphat + UTP → UDP‑Glukose + PPi',
+      'UDP‑Glukose → Kettenverlängerung (Glykogen‑Synthase)',
+      'Lineare Kette → Verzweigungen (Branching‑Enzym)'
+    ];
+
+    const BREAKDOWN_STEPS = [
+      'Glykogen (α1→4‑Enden) → Glukose‑1‑phosphat (Phosphorylase)',
+      'Grenzverzweigung → Transfer + α‑1,6‑Hydrolyse (Debranching)',
+      'Glukose‑1‑phosphat → Glukose‑6‑phosphat (Phosphoglucomutase)',
+      'Glukose‑6‑phosphat (Leber) → Glukose (G6Pase)'
+    ];
+
+    let currentPath = 'synthesis';
+
+    function createOrderItem(text, idx){
+      const li=document.createElement('li'); li.className='order-item drag'; li.draggable=true; li.dataset.step=text; li.dataset.correct=idx;
+      const label=document.createElement('div'); label.textContent=text; label.style.flex='1'; li.appendChild(label);
+      li.addEventListener('dragstart', e=>{ li.classList.add('dragging'); e.dataTransfer.setData('text/plain', text); e.dataTransfer.effectAllowed='move'; });
+      li.addEventListener('dragend', ()=> li.classList.remove('dragging'));
+      return li;
+    }
+
+    function buildOrder(shuffle=true){
+      orderListEl.innerHTML='';
+      const base=(currentPath==='synthesis'? SYNTHESIS_STEPS: BREAKDOWN_STEPS);
+      let arr=base.map((t,i)=>({t,i}));
+      if(shuffle){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
+      arr.forEach(({t,i})=> orderListEl.appendChild(createOrderItem(t,i)));
+      orderScoreEl.textContent = `Korrekte Positionen: 0 / ${base.length}`;
+      document.getElementById('orderHint').textContent = currentPath==='synthesis'
+        ? 'Hinweis: UDP‑Glukose liefert die aktivierte Glukose; Branching erzeugt α1→6‑Äste.'
+        : 'Hinweis: Debranching besitzt zwei Domänen: Transferase und α‑1,6‑Glukosidase.';
+    }
+
+    orderListEl.addEventListener('dragover', e=>{
+      e.preventDefault();
+      const dragging = orderListEl.querySelector('.dragging'); if(!dragging) return;
+      const afterElement = getDragAfterElement(orderListEl, e.clientY);
+      if(afterElement==null){ orderListEl.appendChild(dragging); }
+      else { orderListEl.insertBefore(dragging, afterElement); }
+    });
+
+    function getDragAfterElement(container, y){
+      const els=[...container.querySelectorAll('.order-item:not(.dragging)')];
+      return els.reduce((closest,child)=>{
+        const box=child.getBoundingClientRect(); const offset=y-box.top-box.height/2;
+        if(offset<0 && offset>closest.offset){ return {offset, element:child}; } else { return closest; }
+      }, {offset:Number.NEGATIVE_INFINITY}).element;
+    }
+
+    function checkOrder(){
+      const base=(currentPath==='synthesis'? SYNTHESIS_STEPS: BREAKDOWN_STEPS);
+      const items=[...orderListEl.children];
+      let correct=0; items.forEach((li,idx)=>{
+        const should = Number(li.dataset.correct);
+        if(idx===should){ li.classList.add('correct'); li.classList.remove('wrong'); correct++; }
+        else { li.classList.add('wrong'); li.classList.remove('correct'); }
+      });
+      orderScoreEl.textContent = `Korrekte Positionen: ${correct} / ${base.length}`;
+      return correct;
+    }
+
+    function showSolution(){
+      const base=(currentPath==='synthesis'? SYNTHESIS_STEPS: BREAKDOWN_STEPS);
+      orderListEl.innerHTML='';
+      base.forEach((t,i)=>{ const li=createOrderItem(t,i); li.draggable=false; li.classList.add('correct'); orderListEl.appendChild(li); });
+      orderScoreEl.textContent = `Korrekte Positionen: ${base.length} / ${base.length}`;
+    }
+
+    checkOrderBtn.addEventListener('click', checkOrder);
+    shuffleOrderBtn.addEventListener('click', ()=> buildOrder(true));
+    showSolutionBtn.addEventListener('click', showSolution);
+    togglePathBtn.addEventListener('click', ()=>{
+      currentPath = currentPath==='synthesis'? 'breakdown':'synthesis';
+      togglePathBtn.textContent = 'Pfad: ' + (currentPath==='synthesis'? 'Synthese':'Abbau');
+      buildOrder(true);
+    });
+
+    // Tabs
+    const tabQuiz=document.getElementById('tabQuiz');
+    const tabOrder=document.getElementById('tabOrder');
+    function switchToQuiz(){ document.getElementById('quizCard').style.display='block'; document.getElementById('orderCard').style.display='none'; tabQuiz.classList.add('active'); tabOrder.classList.remove('active'); qSectionReset(); }
+    function switchToOrder(){ document.getElementById('quizCard').style.display='none'; document.getElementById('orderCard').style.display='block'; tabOrder.classList.add('active'); tabQuiz.classList.remove('active'); buildOrder(true); }
+    tabQuiz.addEventListener('click', switchToQuiz);
+    tabOrder.addEventListener('click', switchToOrder);
+
+    function qSectionReset(){ index=0; score=0; renderQuiz(); }
+
+    // Init
+    renderQuiz();
+  </script>
+</body>
+</html>
